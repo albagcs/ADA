@@ -1,0 +1,66 @@
+V "GNAT Lib v4.6"
+M P W=b
+P SS ZX
+R nnnnnnnvnvnnnnnnnnnnnnnvnvnnnnnnnnnnnnnvnnnnvnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+
+U timed_handlers_test%b	timed_handlers_test.adb	7656e92c NE OO SU
+W ada%s			ada.ads			ada.ali
+W ada.calendar%s	a-calend.adb		a-calend.ali
+W ada.calendar.delays%s	a-caldel.adb		a-caldel.ali
+W ada.text_io%s		a-textio.adb		a-textio.ali
+W example_handlers%s	example_handlers.adb	example_handlers.ali
+W timed_handlers%s	timed_handlers.adb	timed_handlers.ali
+
+D ada.ads		20070406091342 3ffc8e18
+D a-calend.ads		20090409150019 343c83dd
+D a-caldel.ads		20090409150019 9f20b83d
+D a-except.ads		20090727140100 0c711ac9
+D a-finali.ads		20090409150019 e5e85fa4
+D a-filico.ads		20090409150019 872dc219
+D a-ioexce.ads		20091130110856 8b9de6cd
+D a-stream.ads		20090409150019 2ca4ee37
+D a-tags.ads		20101021101406 c7695348
+D a-textio.ads		20091028140912 386df5d4
+D a-unccon.ads		20070406091342 f9eb8f06
+D example_handlers.ads	20140114144253 62893a42
+D interfac.ads		20090409150019 f77d8799
+D i-cstrea.ads		20100622165701 1bd72c32
+D system.ads		20120503154647 23e1f70b
+D s-crtl.ads		20100617122610 ac77b159
+D s-exctab.ads		20090417131547 66e51330
+D s-ficobl.ads		20100909103250 443b9d66
+D s-finimp.ads		20090409150019 46853fe8
+D s-finroo.ads		20090409150019 dbb860c9
+D s-parame.ads		20091130110856 9c5d83fa
+D s-secsta.ads		20090707124243 eea35a36
+D s-soflin.ads		20090729085153 9414c974
+D s-stache.ads		20090417130712 596fc1b4
+D s-stalib.ads		20101021102512 c4241c00
+D s-stoele.ads		20090417130712 facd7d98
+D s-stoele.adb		20100617152355 afc5dc80
+D s-stratt.ads		20100909123135 aedef97e
+D s-traent.ads		20090417130712 5221ee41
+D s-unstyp.ads		20090409150019 6ae15c76
+D s-wchcon.ads		20090417130712 bfeb2e3d
+D timed_handlers.ads	20140114144312 fc50485e
+D timed_handlers_test.adb  20140114144318 e4deed39
+X 1 ada.ads
+16K9*Ada 19e8 33|1r6 3r6 8r13 12r7 15r7
+X 2 a-calend.ads
+36K13*Calendar 358e17 33|3w10 8r17 12r11 15r11
+38I9*Time 33|8r26
+52V13*Clock{38I9} 33|12s20 15s20
+94V13*"+"{38I9} 33|12s26 15s26
+X 10 a-textio.ads
+49K13*Text_IO 472e16 33|1w10
+X 12 example_handlers.ads
+3K9*Example_Handlers 9e21 33|5w6 12r33 15r33
+6U14*H 33|12r50
+7U14*H2 33|15r50
+X 32 timed_handlers.ads
+13K9*Timed_Handlers 30e19 33|2w6 11r4 14r4 19r4
+21U14*Set_Timed_Handler 33|11s19 14s19
+28U14*Finalize 33|19s19
+X 33 timed_handlers_test.adb
+7U11*Timed_Handlers_Test 7b11 21l5 21t24
+

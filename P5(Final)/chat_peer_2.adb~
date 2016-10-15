@@ -1,0 +1,534 @@
+--Alba García de la Camacha Selgas
+
+with Chat_Handlers;
+with Lower_Layer_UDP;
+with Ada.Strings.Unbounded;
+with Ada.Text_IO;
+with Ada.Exceptions;
+with Ada.Command_Line;
+with Chat_Messages;
+with Debug;
+with Pantalla;
+with Ada.Calendar;
+with Timed_Handlers;
+
+procedure Chat_Peer_2 is
+   package TIO renames Ada.Text_IO;
+   package LLU renames Lower_Layer_UDP;
+   package ASU renames Ada.Strings.Unbounded;
+   package ACL renames Ada.Command_Line;
+   package CM renames Chat_Messages;
+   package CH renames Chat_Handlers;
+   package AC renames Ada.Calendar;
+   use type CM.Message_Type;
+   use type ASU.Unbounded_String;
+   use type CH.Seq_N_T;
+   use type LLU.End_Point_Type;
+   use type Ada.Calendar.Time;
+   
+   ---------------------------------------------------------------------------
+   -------ENVÍA EL MENSAJE INICIAL. AÑADE INFORMACIÓN A LAS TABLAS------------ 
+   ---------------------------------------------------------------------------
+   
+	procedure Send_Init(EP_R : LLU.End_Point_Type; EP_H : LLU.End_Point_Type; 
+                       Seq_N: in out CH.Seq_N_T; Nick : ASU.Unbounded_String) is
+                       
+	Tipo : CM.Message_Type := CM.Init;
+	EP_H_Creat: LLU.End_Point_Type := EP_H;
+	EP_H_Rsnd: LLU.End_Point_Type := EP_H;
+	EP_R_Creat: LLU.End_Point_Type := EP_R;
+	Vecinos_Array : CH.Neighbors.Keys_Array_Type := CH.Neighbors.Get_Keys(CH.My_Neighbors);
+	NumC : Natural := CH.Neighbors.Map_Length(CH.My_Neighbors);
+	--Corresponde a Sender Dest--
+	Mess: CH.Mess_Id_T;
+	Destino: CH.Destinations_T;
+	--Corresponde a Sender Buffering--
+	Tiempo: Ada.Calendar.Time;
+	Value : CH.Value_T;
+
+	begin
+		-- este será el buffer que quizá luego sea preciso reenviar
+		CM.P_Buffer_Main:= new LLU.Buffer_Type(1024);
+		CM.Message_Type'Output(CM.P_Buffer_Main, Tipo);
+		LLU.End_Point_Type'Output(CM.P_Buffer_Main, EP_H_Creat);
+		CH.Seq_N_T'Output(CM.P_Buffer_Main, Seq_N);
+		LLU.End_Point_Type'Output(CM.P_Buffer_Main, EP_H_Rsnd);
+		LLU.End_Point_Type'Output(CM.P_Buffer_Main, EP_R_Creat);
+		ASU.Unbounded_String'Output(CM.P_Buffer_Main, Nick);
+		--El Init se envía a todos los vecinos que tenemos
+		for K in 1..NumC loop
+			LLU.Send(Vecinos_Array(K), CM.P_Buffer_Main);
+			Debug.Put_Line("        send to: " & CH.End_Point_Image(Vecinos_Array(K)));
+			Destino(K).EP := Vecinos_Array(K);
+		end loop;
+		--Ahora vamos a añadir a las tablas Sender_Dest, según nos vayan asintiendo
+		--borraremos a los vecinos de esta tabla(array destinations).
+		Mess.EP := EP_H_Creat;
+		Mess.Seq := Seq_N;
+		CH.Sender_Dests.Put(CH.Dest, Mess, Destino);  
+		--Ahora añadimos a la tabla Sender_Buffering el mensaje que enviamos y 
+		--está pendiente de ser asentido.
+		Tiempo := AC.Clock + CH.Plazo_Retransmision;
+		Value.EP_H_Creat := EP_H_Creat;
+		Value.Seq_N := Seq_N; 
+		Value.P_Buffer:= CM.P_Buffer_Main;
+		CH.Sender_Buffering.Put(CH.Buffering, Tiempo, Value);
+		Timed_Handlers.Set_Timed_Handler
+    			(Tiempo , CH.Retransmission'Access); 
+	end Send_Init;
+    
+    ----------------------------------------------------------------------------
+    ------------ENVÍA EL CONFIRM Y AÑADE INFORMACIÓN A LAS TABLAS---------------
+    ----------------------------------------------------------------------------
+    
+	procedure Send_Confirm(EP_H : LLU.End_Point_Type; Seq_N: in out CH.Seq_N_T; 
+  		  			Nick : ASU.Unbounded_String) is
+                       
+	Tipo : CM.Message_Type := CM.Confirm;
+	EP_H_Creat: LLU.End_Point_Type := EP_H;
+	EP_H_Rsnd: LLU.End_Point_Type := EP_H;
+	Vecinos_Array : CH.Neighbors.Keys_Array_Type := CH.Neighbors.Get_Keys(CH.My_Neighbors);
+	NumC : Natural := CH.Neighbors.Map_Length(CH.My_Neighbors);
+	--Corresponde a Sender Dest
+	Mess: CH.Mess_Id_T;
+	Destino: CH.Destinations_T;
+	--Corresponde a Sender Buffering
+	Tiempo: Ada.Calendar.Time;
+	Value : CH.Value_T;
+
+	begin
+		-- este será el buffer que quizá luego sea preciso reenviar
+		CM.P_Buffer_Main:= new LLU.Buffer_Type(1024);
+		CM.Message_Type'Output(CM.P_Buffer_Main, Tipo);
+		LLU.End_Point_Type'Output(CM.P_Buffer_Main, EP_H_Creat);
+		CH.Seq_N_T'Output(CM.P_Buffer_Main, Seq_N);
+		LLU.End_Point_Type'Output(CM.P_Buffer_Main, EP_H_Rsnd);
+		ASU.Unbounded_String'Output(CM.P_Buffer_Main, Nick);
+		--El confirm se envía a todos los vecinos que tenemos
+		for K in 1..NumC loop
+			LLU.Send(Vecinos_Array(K), CM.P_Buffer_Main);
+			Debug.Put_Line("        send to: " & CH.End_Point_Image(Vecinos_Array(K)));
+			Destino(K).EP := Vecinos_Array(K);
+		end loop;
+		--Ahora vamos a añadir a las tablas Sender_Dest, según nos vayan asintiendo
+		--borraremos a los vecinos de esta tabla(array destinations).
+		Mess.EP := EP_H_Creat;
+		Mess.Seq := Seq_N;
+		CH.Sender_Dests.Put(CH.Dest, Mess, Destino);  
+		--Ahora añadimos a la tabla Sender_Buffering el mensaje que enviamos y 
+		--está pendiente de ser asentido.
+		Tiempo := AC.Clock + CH.Plazo_Retransmision;
+		Value.EP_H_Creat := EP_H_Creat;
+		Value.Seq_N := Seq_N; 
+		Value.P_Buffer:= CM.P_Buffer_Main;
+		CH.Sender_Buffering.Put(CH.Buffering, Tiempo, Value);
+		Timed_Handlers.Set_Timed_Handler
+			(Tiempo , CH.Retransmission'Access);
+    	 
+	end Send_Confirm;
+       
+    ----------------------------------------------------------------------------
+    ------------ENVÍA EL LOGOUT Y AÑADE INFORMACIÓN A LAS TABLAS----------------  
+    ----------------------------------------------------------------------------
+    
+	procedure Send_Logout(EP_H : LLU.End_Point_Type; Seq_N: in out CH.Seq_N_T; 
+  		   Nick : ASU.Unbounded_String; Confirm_Sent: Boolean) is
+
+	Tipo : CM.Message_Type := CM.Logout;
+	EP_H_Creat: LLU.End_Point_Type := EP_H;
+	EP_H_Rsnd: LLU.End_Point_Type := EP_H;
+	Vecinos_Array : CH.Neighbors.Keys_Array_Type := CH.Neighbors.Get_Keys(CH.My_Neighbors);
+	NumC : Natural := CH.Neighbors.Map_Length(CH.My_Neighbors);
+	--Corresponde a Sender Dest
+	Mess: CH.Mess_Id_T;
+	Destino: CH.Destinations_T;
+	--Corresponde a Sender Buffering
+	Tiempo: Ada.Calendar.Time;
+	Value : CH.Value_T;
+
+	begin
+		-- este será el buffer que quizá luego sea preciso reenviar
+		CM.P_Buffer_Main:= new LLU.Buffer_Type(1024);
+		CM.Message_Type'Output(CM.P_Buffer_Main, Tipo);
+		LLU.End_Point_Type'Output(CM.P_Buffer_Main, EP_H_Creat);
+		CH.Seq_N_T'Output(CM.P_Buffer_Main, Seq_N);
+		LLU.End_Point_Type'Output(CM.P_Buffer_Main, EP_H_Rsnd);
+		ASU.Unbounded_String'Output(CM.P_Buffer_Main, Nick);
+		Boolean'Output(CM.P_Buffer_Main, Confirm_Sent);
+		--El Logout se envía a todos los vecinos que tenemos
+		for K in 1..NumC loop
+			LLU.Send(Vecinos_Array(K), CM.P_Buffer_Main);
+			Debug.Put_Line("        send to: " & CH.End_Point_Image(Vecinos_Array(K)));
+			Destino(K).EP := Vecinos_Array(K);
+		end loop;
+		--Ahora vamos a añadir a las tablas Sender_Dest, según nos vayan asintiendo
+		--borraremos a los vecinos de esta tabla(array destinations).
+		Mess.EP := EP_H_Creat;
+		Mess.Seq := Seq_N;
+		CH.Sender_Dests.Put(CH.Dest, Mess, Destino);  
+		--Ahora añadimos a la tabla Sender_Buffering el mensaje que enviamos y 
+		--está pendiente de ser asentido.
+		Tiempo := AC.Clock + CH.Plazo_Retransmision;
+		Value.EP_H_Creat := EP_H_Creat;
+		Value.Seq_N := Seq_N; 
+		Value.P_Buffer:= CM.P_Buffer_Main;
+		CH.Sender_Buffering.Put(CH.Buffering, Tiempo, Value);
+		Timed_Handlers.Set_Timed_Handler
+    			(Tiempo , CH.Retransmission'Access);
+	end Send_Logout;
+    
+    ----------------------------------------------------------------------------
+    ------------ENVÍA EL WRITER Y AÑADE INFORMACIÓN A LAS TABLAS----------------
+    ----------------------------------------------------------------------------
+    
+	procedure Send_Writer(EP_H : LLU.End_Point_Type; Seq_N: in out CH.Seq_N_T; 
+  		   Nick : ASU.Unbounded_String; Comentario: ASU.Unbounded_String) is
+		  		    
+	Tipo : CM.Message_Type := CM.Writer;
+	EP_H_Creat: LLU.End_Point_Type := EP_H;
+	EP_H_Rsnd: LLU.End_Point_Type := EP_H; 
+	Vecinos_Array : CH.Neighbors.Keys_Array_Type := CH.Neighbors.Get_Keys(CH.My_Neighbors);
+	NumC : Natural := CH.Neighbors.Map_Length(CH.My_Neighbors);
+	--Corresponde a Sender Dest
+	Mess: CH.Mess_Id_T;
+	Destino: CH.Destinations_T;
+	--Corresponde a Sender Buffering
+	Tiempo: Ada.Calendar.Time;
+	Value : CH.Value_T;
+   
+	begin  
+		-- este será el buffer que quizá luego sea preciso reenviar
+		CM.P_Buffer_Main:= new LLU.Buffer_Type(1024);
+		CM.Message_Type'Output(CM.P_Buffer_Main, Tipo);
+		LLU.End_Point_Type'Output(CM.P_Buffer_Main, EP_H_Creat);
+		CH.Seq_N_T'Output(CM.P_Buffer_Main, Seq_N);
+		LLU.End_Point_Type'Output(CM.P_Buffer_Main, EP_H_Rsnd);
+		ASU.Unbounded_String'Output(CM.P_Buffer_Main, Nick);
+		ASU.Unbounded_String'Output(CM.P_Buffer_Main, Comentario);
+		--El writer se envía a todos los vecinos que tenemos
+		for K in 1..NumC loop
+			LLU.Send(Vecinos_Array(K), CM.P_Buffer_Main);
+			Debug.Put_Line("        send to: " & CH.End_Point_Image(Vecinos_Array(K)));
+			Destino(K).EP := Vecinos_Array(K);
+		end loop;
+		--Ahora vamos a añadir a las tablas Sender_Dest, según nos vayan asintiendo
+		--borraremos a los vecinos de esta tabla(array destinations).
+		Mess.EP := EP_H_Creat;
+		Mess.Seq := Seq_N;
+		CH.Sender_Dests.Put(CH.Dest, Mess, Destino);  
+		--Ahora añadimos a la tabla Sender_Buffering el mensaje que enviamos y 
+		--está pendiente de ser asentido.
+		Tiempo := AC.Clock + CH.Plazo_Retransmision;
+		Value.EP_H_Creat := EP_H_Creat;
+		Value.Seq_N := Seq_N; 
+		Value.P_Buffer:= CM.P_Buffer_Main;
+		CH.Sender_Buffering.Put(CH.Buffering, Tiempo, Value);
+		Timed_Handlers.Set_Timed_Handler
+				(Tiempo , CH.Retransmission'Access); 
+	end Send_Writer;
+   
+   
+	EP_R: LLU.End_Point_Type;
+	EP_H: LLU.End_Point_Type;
+	Buffer:    aliased LLU.Buffer_Type(1024);
+	Expired : Boolean;
+	Usage_Error : exception;
+	Delay_Error : exception;
+	Percent_Error : exception;
+	Mi_Vecino1EP : LLU.End_Point_Type;
+	Mi_Vecino2EP : LLU.End_Point_Type;
+	Success : Boolean;
+	Tipo : CM.Message_Type;
+	Seq_N: CH.Seq_N_T := 0;
+	Confirm_Sent: Boolean;
+	EP_H_Reject: LLU.End_Point_Type;
+	Nick : ASU.Unbounded_String;
+	Comentario : ASU.Unbounded_String;
+	Message_Keys : CH.Latest_Msgs.Keys_Array_Type;
+	Min_Delay: Integer;
+	Max_Delay: Integer;
+	Fault_pct: Natural;
+	Destino: CH.Destinations_T;
+	Status: Boolean:= True;
+	Prompt: Boolean:= False;
+   
+   
+begin
+	if ACL.Argument_Count < 5 or ACL.Argument_Count = 6 or ACL.Argument_Count =8  
+  																or ACL.Argument_Count > 9 then
+		raise Usage_Error;
+	end if;
+  
+  ---------------OBTENGO MI NICK, FIJO LOS RETARDOS DE PROPAGACIÓN--------------
+  ----------------------Y PORCENTAJE DE PÉRDIDAS--------------------------------
+  
+	CH.My_Nick := ASU.To_Unbounded_String(ACL.Argument(2));
+	Min_Delay := Integer'Value(ACL.Argument(3));
+	Max_Delay := Integer'Value(ACL.Argument(4));
+	Fault_pct := Integer'Value(ACL.Argument(5));
+  
+	if ACL.Argument(4) < ACL.Argument(3) then
+		raise Delay_Error;
+	end if;
+  
+	if Natural'Value(ACL.Argument(5)) > 100 then
+		raise Percent_Error;
+	end if;
+  
+  --------PROVOCO PÉRDIDAS, PLAZO RETRANS Y ME ATO A MIS DOS END POINTS---------
+  
+	LLU.Set_Faults_Percent (Fault_pct);
+	LLU.Set_Random_Propagation_Delay (Min_Delay, Max_Delay);
+	CH.Plazo_Retransmision := 2 * Duration(Max_Delay) / 1000;
+	EP_H := LLU.Build(LLU.To_IP(LLU.Get_Host_Name), Natural'Value(ACL.Argument(1)));
+	LLU.Bind(EP_H, CH.Handler'Access);
+	LLU.Bind_Any(EP_R);
+ 
+ ----------------------------SI SÓLO HAY UN NODO--------------------------------
+ 
+	if ACL.Argument_Count = 5 then
+		Debug.Put_Line("No hacemos protocolos de admisión porque no tenemos contactos iniciales...");
+		Debug.Put_Line("Peer-Chat v2.0", Pantalla.Blanco);
+		Debug.Put_Line("===============", Pantalla.Blanco);
+		TIO.Put_Line("");
+		Debug.Put("Entramos en el chat con Nick : ", Pantalla.Blanco);
+		Debug.Put_Line(ASU.To_String(CH.My_Nick), Pantalla.Blanco);
+		Debug.Put_Line(".h para help", Pantalla.Blanco);
+  
+  ----------------------SI HAY MÁS DE UN NODO EJECUTÁNDOSE---------------------- 
+  
+	else
+		--Añado a mi Vecino1--
+		Mi_Vecino1EP := LLU.Build(LLU.To_IP(ACL.Argument(6)),Natural'Value(ACL.Argument(7)));
+		CH.Neighbors.Put(CH.My_Neighbors, Mi_Vecino1EP, Ada.Calendar.Clock, Success);
+		Debug.Put_Line("Añadimos a neighbors " & CH.End_Point_Image(Mi_Vecino1EP));
+		Seq_N := Seq_N + 1;
+		--Añado a Vecino2 si tengo--
+		if ACL.Argument_Count = 9 then
+			Mi_Vecino2EP := LLU.Build(LLU.To_IP(ACL.Argument(8)), 
+												Natural'Value(ACL.Argument(9)));
+			CH.Neighbors.Put(CH.My_Neighbors, Mi_Vecino2EP, Ada.Calendar.Clock,
+		   																	 Success);
+			Debug.Put_Line("Añadimos a neighbors " & CH.End_Point_Image(Mi_Vecino2EP));
+		end if;
+		Debug.Put_Line("");
+		Debug.Put_Line("Iniciando protocolo de admisión ...");
+		--Añado mi mensaje inicial a mi tabla de últimos mensajes, y envío el Init
+		CH.Latest_Msgs.Put(CH.Messages, EP_H, Seq_N, Success);
+		Debug.Put_line("Añadimos a latest_messages " & CH.End_Point_Image(EP_H) 
+		     			& CH.Seq_N_T'Image(Seq_N));
+		Debug.Put("FLOOD Init  ", Pantalla.Amarillo);
+		Debug.Put(CH.End_Point_Image(EP_H) &  CH.Seq_N_T'Image(Seq_N) & " " 
+								&  CH.End_Point_Image(EP_H));
+		Debug.Put_Line( "..." & ASU.To_String(CH.My_Nick)); 
+		Send_Init(EP_R, EP_H, Seq_N, CH.My_Nick);		 
+		TIO.Put_Line("");
+		      			
+		------------------------ESPERO A RECIBIR UN REJECT------------------------
+		
+		LLU.Reset(Buffer);    			
+		LLU.Receive (EP_R, Buffer'Access, 2.0, Expired);  
+		if Expired then
+		   -- Si pasan dos segundos y no recibí un Reject, envío el Confirm 
+		   --y entro en el chat.
+		   Seq_N := Seq_N + 1;
+		   CH.Latest_Msgs.Put(CH.Messages, EP_H, Seq_N, Success);
+		   TIO.Put_Line("");
+		   Debug.Put_line("Añadimos a latest_messages " & CH.End_Point_Image(EP_H) 
+		      			& CH.Seq_N_T'Image(Seq_N));  
+		   Debug.Put("FLOOD Confirm ", Pantalla.Amarillo); 
+		   Send_Confirm(EP_H, Seq_N, CH.My_Nick);
+		   TIO.Put_Line("");
+		   Debug.Put_line("Fin del protocolo de admisión");
+		   TIO.Put_Line("");
+		   Debug.Put_Line("Peer-Chat v2.0", Pantalla.Blanco);
+		   Debug.Put_Line("===============", Pantalla.Blanco);
+		   TIO.Put_Line("");
+		   Debug.Put("Entramos en el chat con Nick : ", Pantalla.Blanco);
+		   Debug.Put_Line(ASU.To_String(CH.My_Nick), Pantalla.Blanco);
+		   Debug.Put_Line(".h para help", Pantalla.Blanco);
+		   
+		else 
+			--Si recibo el Reject, lo proceso.
+			Tipo := CM.Message_Type'Input(Buffer'Access);
+			EP_H_Reject := LLU.End_Point_Type'Input(Buffer'Access);
+			Nick := ASU.Unbounded_String'Input(Buffer'Access);
+			Debug.Put("RCV Reject");
+			Debug.Put_Line(CH.End_Point_Image(EP_H_Reject) & ASU.To_String(Nick));
+			Debug.Put("Usuario rechazado porque ", Pantalla.Blanco);
+			Debug.Put(CH.End_Point_Image(EP_H_Reject), Pantalla.Blanco);
+			Debug.Put_Line(" está usando el mismo nick", Pantalla.Blanco);
+		   --Si he recibido el Reject tengo que enviar el Logout.
+		   Confirm_Sent := False;
+		   Seq_N := Seq_N + 1;
+		   Send_Logout(EP_H, Seq_N, CH.My_Nick, Confirm_Sent);
+		   Debug.Put("FLOOD Logout ", Pantalla.Amarillo);
+		   Debug.Put_Line(CH.End_Point_Image(EP_H) &  CH.Seq_N_T'Image(Seq_N) & " " 
+		   		& CH.End_Point_Image(EP_H) & "  " &ASU.To_String(CH.My_Nick) & " " 
+		   													& Boolean'Image(Confirm_Sent));
+		   TIO.Put_Line("");
+		   Debug.Put_line("Fin del protocolo de admisión");
+		  
+		   ---el nodo no debería terminar su ejecución hasta asegurarse de que 
+		   --ha recibido el asentimento de su mensaje Logout por parte de todos 
+		   --sus vecinos. Para ello puede esperar con un delay en el programa 
+		   --principal un tiempo igual a 10 veces el plazo de retransmisión, 
+		   --que sería lo que tardaría en retransmitir el Logout a todos sus 
+		   --vecinos en el caso peor.
+
+			loop 
+				delay CH.Plazo_Retransmision;
+		   exit when CH.Sender_Buffering.Map_Length(CH.Buffering) = 0;
+		   end loop;
+			LLU.Finalize;
+			Timed_Handlers.Finalize;
+		   
+		end if;
+	end if; 
+      
+	loop 	
+   
+		if Prompt then
+   		TIO.Put(ASU.To_String(CH.My_Nick) & ">>");
+   	end if;
+   	 
+		Comentario := ASU.To_Unbounded_String(Ada.Text_IO.Get_Line);
+   	 
+      if Comentario = ".salir" then
+        Seq_N := Seq_N + 1;
+        Confirm_Sent := True;
+        Debug.Put("FLOOD Logout ", Pantalla.Amarillo);
+		  Debug.Put_Line(CH.End_Point_Image(EP_H) &  CH.Seq_N_T'Image(Seq_N) & " "
+		  												 & CH.End_Point_Image(EP_H) &
+		   			"  " &ASU.To_String(CH.My_Nick) & " " & Boolean'Image(Confirm_Sent));
+        Send_Logout(EP_H, Seq_N, CH.My_Nick, Confirm_Sent);
+         --el nodo no debería terminar su ejecución hasta asegurarse de que 
+		   --ha recibido el asentimento de su mensaje Logout por parte de todos 
+		   --sus vecinos. Para ello puede esperar con un delay en el programa 
+		   --principal un tiempo igual a 10 veces el plazo de retransmisión, 
+		   --que sería lo que tardaría en retransmitir el Logout a todos sus 
+		   --vecinos en el caso peor.
+		loop 
+			delay CH.Plazo_Retransmision;
+		exit when CH.Sender_Buffering.Map_Length(CH.Buffering) = 0;
+		end loop;
+		LLU.Finalize;
+      Timed_Handlers.Finalize;
+        
+     elsif Comentario = ".h" then
+         Debug.Put_Line("        Comandos             Efectos", Pantalla.Rojo);
+         Debug.Put_Line("        =================    =======", Pantalla.Rojo);
+         Debug.Put_Line("        .nb .neihbors        lista de vecinos",Pantalla.Rojo);
+         Debug.Put_Line("        .lm .latest_msgs    lista de últimos mensajes recibidos",
+         																			Pantalla.Rojo);
+         Debug.Put_Line("        .sd .sender_dests    tabla sender_dests",
+         																			Pantalla.Rojo);
+         Debug.Put_Line("        .sb .sender_buffering    tabla sender_buffering",
+         																			Pantalla.Rojo);
+         Debug.Put_Line("        .debug              toggle para info de debug",
+         																			Pantalla.Rojo);
+         Debug.Put_Line("        .wai .whoami        Muestra en pantalla: nick | EP_H | EP_R",
+         																       Pantalla.Rojo);
+         Debug.Put_Line("        .prompt             toggle para mostrar prompt",
+         																	Pantalla.Rojo);
+         Debug.Put_Line("        .h .help            muestra esta información de ayuda",
+         																	Pantalla.Rojo);
+         Debug.Put_Line("        .salir              termina el programa",
+         																	Pantalla.Rojo);
+         																	
+     -----------------------IMPRIME MIS VECINOS--------------------------------- 
+     elsif Comentario = ".nb" or Comentario = ".neighbors" then
+     		Pantalla.Poner_Color(Pantalla.Rojo);
+     		TIO.Put_Line("Neighbors:");
+     		CH.Neighbors.Print_Map(CH.My_Neighbors);
+     		Pantalla.Poner_Color(Pantalla.Cierra);
+     		
+     ------------------IMPRIME TABLA LATEST_MSGS--------------------------------
+     elsif Comentario = ".lm" or Comentario = ".latest_msgs" then
+     		Pantalla.Poner_Color(Pantalla.Rojo);
+     		TIO.Put_Line("Latest_Messages:");
+     		CH.Latest_Msgs.Print_Map(CH.Messages);
+     		Pantalla.Poner_Color(Pantalla.Cierra);
+     		
+     elsif Comentario = ".sd" or Comentario = ".sender_dests" then
+     		Pantalla.Poner_Color(Pantalla.Rojo);
+     		TIO.Put_Line("Sender_Dests");
+     		CH.Sender_Dests.Print_Map(CH.Dest);
+     		Pantalla.Poner_Color(Pantalla.Cierra);
+     	
+     	elsif Comentario = ".sb" or Comentario = ".sender_buffering" then
+     		Pantalla.Poner_Color(Pantalla.Rojo);
+     		TIO.Put_Line("Sender_Buffering");
+     		CH.Sender_Buffering.Print_Map(CH.Buffering);
+     		Pantalla.Poner_Color(Pantalla.Cierra);
+     			
+     elsif Comentario = ".wai" or Comentario = ".whoami" then
+     		Debug.Put_Line("Nick: " & ASU.To_String(CH.My_Nick) & " | EP_H: " 
+     		& CH.End_Point_Image(EP_H)&
+     						" | EP_R: " & CH.End_Point_Image(EP_R), Pantalla.Rojo);
+     						
+     --------------------REVISAR EJECUCIÓN PROMPT-------------------------------
+     
+     elsif Comentario = ".prompt" then
+     		Pantalla.Poner_Color(Pantalla.Rojo);
+     		Prompt:= not Prompt;
+     		Debug.Set_Status(Prompt);
+     		if Prompt then
+     			TIO.Put_Line("Activado el prompt");
+     		else
+     			TIO.Put_Line("Desactivado el prompt");
+     		end if;
+     		Pantalla.Poner_Color(Pantalla.Cierra);
+     -------------------REVISAR EJECUCIÓN DEBUG---------------------------------
+     
+     elsif Comentario = ".debug" then
+     		Pantalla.Poner_Color(Pantalla.Rojo);
+     		Status := not Status;
+     		Debug.Set_Status(Status);
+     		if Status = True then
+     			TIO.Put_Line("Activada información de debug");
+     		else
+     			TIO.Put_Line("Desactivada información de debug");
+     		end if;
+     		Pantalla.Poner_Color(Pantalla.Cierra);
+     else
+     		Seq_N := Seq_N + 1;
+     		Debug.Put_line("Añadimos a latest_messages " & CH.End_Point_Image(EP_H) 
+		      			& CH.Seq_N_T'Image(Seq_N));
+		   CH.Latest_Msgs.Put(CH.Messages, EP_H, Seq_N, Success);
+		   Debug.Put("FLOOD Writer ", Pantalla.Amarillo);
+		   Debug.Put_Line(CH.End_Point_Image(EP_H) &  CH.Seq_N_T'Image(Seq_N) & " " 
+		   														& CH.End_Point_Image(EP_H) &
+		   			"  " &ASU.To_String(CH.My_Nick)& " " & ASU.To_String(Comentario));
+     		Send_Writer(EP_H, Seq_N, CH.My_Nick, Comentario);
+  		   
+     end if;
+     exit when Comentario = ".salir";
+    end loop;			
+   
+exception
+   when Usage_Error =>
+      TIO.Put_Line("Argumentos incorrectos, introduzca:");
+      TIO.Put_Line("port nickname min_delay max_delay fault_pct"&
+      						 "[[nb_host nb_port] [nb_host nb_port]]");
+      LLU.Finalize;
+      Timed_Handlers.Finalize;
+
+   when Delay_Error =>
+   	TIO.Put_Line("Max_Delay debe ser mayor que Min_Delay");
+   	LLU.Finalize;
+   	Timed_Handlers.Finalize;
+
+   when Percent_Error =>
+   	TIO.Put_Line("introduce número entre 0 y 100 para el argumento 5");
+   	LLU.finalize;
+   	Timed_Handlers.Finalize;
+
+   when Ex:others =>
+      Ada.Text_IO.Put_Line ("Excepción imprevista: " &
+                            Ada.Exceptions.Exception_Name(Ex) & " en: " &
+                            Ada.Exceptions.Exception_Message(Ex));
+      LLU.Finalize;
+		Timed_Handlers.Finalize;
+
+end Chat_Peer_2;

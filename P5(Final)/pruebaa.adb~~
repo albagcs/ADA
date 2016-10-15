@@ -1,0 +1,12 @@
+with Ada.Text_IO;
+with Ada.Strings.Unbounded;
+with Ordered_Maps_G;
+with Ada.Calendar;
+with Gnat.Calendar.Time_IO;
+with Lower_Layer_UDP;
+
+package Prueba is 
+
+   package LLU renames Lower_Layer_UDP;
+   package C_IO renames Gnat.Calendar.Time_IO;
+   package ASU renames Ada.Strings.Unbounded;
