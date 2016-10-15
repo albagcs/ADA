@@ -1,0 +1,29 @@
+with Ada.Text_IO;
+with Ada.Strings.Unbounded;
+with Chat_Messages;
+
+package body Handlers is
+
+   package ASU renames Ada.Strings.Unbounded;
+   package CM renames Chat_Messages;
+   package TIO renames Ada.Text_IO;
+
+   procedure Client_Handler (From    : in     LLU.End_Point_Type;
+                             To      : in     LLU.End_Point_Type;
+                             P_Buffer: access LLU.Buffer_Type) is
+      Tipo : CM.Message_Type;
+      Nick : ASU.Unbounded_String;
+      Comentario : ASU.Unbounded_String;
+   begin
+      -- saca del Buffer P_Buffer.all un Unbounded_String
+      Tipo := CM.Message_Type'Input(P_Buffer);
+      Nick := ASU.Unbounded_String'Input(P_Buffer);
+      Comentario := ASU.Unbounded_String'Input(P_Buffer);
+      TIO.Put_Line("");
+      TIO.Put_Line(ASU.To_String(Nick)&": " &ASU.To_String(Comentario));
+      TIO.Put(">>");
+      
+   end Client_Handler;
+
+end Handlers;
+
