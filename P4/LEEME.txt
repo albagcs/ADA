@@ -1,0 +1,59 @@
+                               Chat-Peer v1.0 
+                                    LEEME
+                              Noviembre de 2012
+
+
+chat_peer es un programa ejecutable que implementa la especificación
+de Chat-Peer v1.0, el programa que hay que realizar en la práctica 4
+de la asignatura Programación de Sistemas de Telecomunicación /
+Informática II del curso 2012/2013.
+
+INSTRUCCIONES: 
+- Descarga el fichero chat_peer.zip
+- Descomprime el fichero para obtener el ejecutable chat_peer: puedes 
+  hacerlo con el Gestor de Descargas de Ubuntu, o directamente en una 
+  ventana de terminal escribiendo:
+      unzip chat_peer.zip
+
+Utiliza el programa chat_peer para entender mejor la especificación de
+Chat-Peer v1.0 y para depurar tu propia implementación, que debería
+poder intercambiar mensajes con este programa.
+
+
+* Ayuda
+
+Con .h o .help se muestra un menú con comandos que pueden serte
+útiles. Es muy recomendable que implementes estos comandos útiles también
+en tu práctica para que te ayude a ir depurando el mismo minentras lo 
+desarrollas.
+
+Si tienes cualquier duda sobre el programa, o tienes problemas para
+utilizarlo, pon un mensaje en el foro de la asignatura.
+
+
+* Colores utilizados
+
+Para que los colores que se muestran por la salida estándar se vean
+bien es conveniente que la ventana en la que ejecutes el programa
+tenga un fondo negro. A continuación mostramos el código de los
+colores utilizado por chat_peer:
+
+  - Blanco: se utiliza para mostrar la información propia de la
+    aplicación
+
+  - Rojo: se utiliza para mostrar información producida por la
+    ejecución de comandos (ver .help)
+
+  - Amarillo y verde: se utilizan para mostrar información de
+    depuración
+
+
+* Mensajes de depuración:
+
+Los mensajes de depuración aparecen en color amarillo y verde. Si bien
+no es un requisito, es MUY RECOMENDABLE que tu práctica muestre en
+pantalla mensajes similares ya que ello te ayudará a depurar tu
+código.
+
+Con el comando .debug puedes desactivar/activar los mensajes de
+depuración.  Cuando arrancas chat_peer están activados.

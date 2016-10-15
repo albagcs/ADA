@@ -1,0 +1,69 @@
+V "GNAT Lib v4.6"
+P SS ZX
+R nnnnnnnnnnnnnnnnnnnnnnnnnvnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn
+
+U debug%b		debug.adb		969e5c4a NE OO PK
+W ada%s			ada.ads			ada.ali
+W ada.text_io%s		a-textio.adb		a-textio.ali
+
+U debug%s		debug.ads		dd5b2e9f EE NE OO PK
+W pantalla%s		pantalla.adb		pantalla.ali
+
+D ada.ads		20070406091342 3ffc8e18
+D a-except.ads		20090727140100 0c711ac9
+D a-finali.ads		20090409150019 e5e85fa4
+D a-filico.ads		20090409150019 872dc219
+D a-ioexce.ads		20091130110856 8b9de6cd
+D a-stream.ads		20090409150019 2ca4ee37
+D a-tags.ads		20101021101406 c7695348
+D a-textio.ads		20091028140912 386df5d4
+D a-unccon.ads		20070406091342 f9eb8f06
+D debug.ads		20131226194140 410922c8
+D debug.adb		20131226194143 effa8b56
+D interfac.ads		20090409150019 f77d8799
+D i-cstrea.ads		20100622165701 1bd72c32
+D pantalla.ads		20131226194246 9c520c57
+D system.ads		20120503154647 23e1f70b
+D s-crtl.ads		20100617122610 ac77b159
+D s-exctab.ads		20090417131547 66e51330
+D s-ficobl.ads		20100909103250 443b9d66
+D s-finimp.ads		20090409150019 46853fe8
+D s-finroo.ads		20090409150019 dbb860c9
+D s-parame.ads		20091130110856 9c5d83fa
+D s-secsta.ads		20090707124243 eea35a36
+D s-soflin.ads		20090729085153 9414c974
+D s-stache.ads		20090417130712 596fc1b4
+D s-stalib.ads		20101021102512 c4241c00
+D s-stoele.ads		20090417130712 facd7d98
+D s-stoele.adb		20100617152355 afc5dc80
+D s-stratt.ads		20100909123135 aedef97e
+D s-traent.ads		20090417130712 5221ee41
+D s-unstyp.ads		20090409150019 6ae15c76
+D s-wchcon.ads		20090417130712 bfeb2e3d
+X 1 ada.ads
+16K9*Ada 19e8 11|1r6 24r10 35r10
+X 8 a-textio.ads
+49K13*Text_IO 472e16 11|1w10 24r14 35r14
+243U14*Put 11|35s22
+264U14*Put_Line 11|24s22
+X 10 debug.ads
+3K9*Debug 24l5 24e10 11|3b14 40l5 40t10
+7U14*Set_Status 7>26 11|7b14 10l8 10t18
+7b26 Status{boolean} 11|7b26 9r19
+10V13*Get_Status{boolean} 11|13b13 16l8 16t18
+14U14*Put_Line 14>24 15>24 11|19b14 27l8 27t16
+14s24 Msg{string} 11|19b24 24r31
+15e24 Color_Msg{14|16E9} 11|20b24 23r31
+20U14*Put 20>24 21>24 11|30b14 38l8 38t11
+20s24 Msg{string} 11|30b19 35r26
+21e24 Color_Msg{14|16E9} 11|31b19 34r31
+X 11 debug.adb
+5b4 Do_Debug{boolean} 9m7 15r14 22r10 33r10
+X 14 pantalla.ads
+11K9*Pantalla 10|1w6 15r38 15r58 21r38 21r58 11|20r38 20r58 23r10 25r10 25r31
+. 31r33 31r53 34r10 36r10 36r31 14|39e13
+16E9*T_Color 10|15r47 21r47 11|20r47 31r42 14|17e57
+16n21*Verde{16E9} 10|15r67 21r67 11|20r67 31r62
+17n50*Cierra{16E9} 11|25r40 36r40
+27U14*Poner_Color 11|23s19 25s19 34s19 36s19
+

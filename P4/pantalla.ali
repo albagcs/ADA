@@ -1,0 +1,123 @@
+V "GNAT Lib v4.6"
+P SS ZX
+R nnnnnnnnnnnnnnnnnnvnnvnnnvnnnnnnnnnnnnnnnnnnvnnnnnnnnnnnnnnnnnnvvnnnnnnnnnnnnnnn
+
+U pantalla%b		pantalla.adb		dd0a4905 OO PK
+W ada%s			ada.ads			ada.ali
+W ada.exceptions%s	a-except.adb		a-except.ali
+W ada.tags%s		a-tags.adb		a-tags.ali
+W ada.text_io%s		a-textio.adb		a-textio.ali
+W ada.text_io.integer_aux%s  a-tiinau.adb	a-tiinau.ali
+W ada.text_io.integer_io%s
+W interfaces%s		interfac.ads		interfac.ali
+W system.soft_links%s	s-soflin.adb		s-soflin.ali
+W text_io%s		text_io.ads		text_io.ali
+
+U pantalla%s		pantalla.ads		9c520c57 EE OO PK
+W ada.tags%s		a-tags.adb		a-tags.ali
+W system%s		system.ads		system.ali
+W system.exception_table%s  s-exctab.adb	s-exctab.ali
+W system.standard_library%s  s-stalib.adb	s-stalib.ali
+
+D ada.ads		20070406091342 3ffc8e18
+D a-except.ads		20090727140100 0c711ac9
+D a-finali.ads		20090409150019 e5e85fa4
+D a-filico.ads		20090409150019 872dc219
+D a-ioexce.ads		20091130110856 8b9de6cd
+D a-stream.ads		20090409150019 2ca4ee37
+D a-tags.ads		20101021101406 c7695348
+D a-textio.ads		20091028140912 386df5d4
+D a-tiinau.ads		20090409150019 8114c8e4
+D a-tiinio.ads		20090409150019 aa04e5d6
+D a-tiinio.adb		20091130162119 df9cd7af
+D a-unccon.ads		20070406091342 f9eb8f06
+D interfac.ads		20090409150019 f77d8799
+D i-cstrea.ads		20100622165701 1bd72c32
+D pantalla.ads		20131226194246 9c520c57
+D pantalla.adb		20131226194247 048e639b
+D system.ads		20120503154647 23e1f70b
+D s-crtl.ads		20100617122610 ac77b159
+D s-exctab.ads		20090417131547 66e51330
+D s-ficobl.ads		20100909103250 443b9d66
+D s-finimp.ads		20090409150019 46853fe8
+D s-finroo.ads		20090409150019 dbb860c9
+D s-parame.ads		20091130110856 9c5d83fa
+D s-secsta.ads		20090707124243 eea35a36
+D s-soflin.ads		20090729085153 9414c974
+D s-stache.ads		20090417130712 596fc1b4
+D s-stalib.ads		20101021102512 c4241c00
+D s-stoele.ads		20090417130712 facd7d98
+D s-stoele.adb		20100617152355 afc5dc80
+D s-stratt.ads		20100909123135 aedef97e
+D s-traent.ads		20090417130712 5221ee41
+D s-unstyp.ads		20090409150019 6ae15c76
+D s-wchcon.ads		20090417130712 bfeb2e3d
+D text_io.ads		20070406091342 45d626c9
+X 8 a-textio.ads
+74I12*Field{integer}
+209U14*Put 16|22s15 34s15 37s15 39s15 48s15 65s21 68s21 71s21 74s21 77s21
+. 80s21 83s21 86s21 89s21 92s21 106s21 109s21 112s21 115s21 118s21 121s21
+. 124s21 127s21
+209e19 Item{character} 16|22r20 34r20 37r20 39r20
+243U14*Put 16|23s15 35s15 50s35 51s35 52s35 66s21 69s21 72s21 75s21 78s21
+. 81s21 84s21 87s21 90s21 93s21 107s21 110s21 113s21 116s21 119s21 122s21
+. 125s21 128s21
+243s19 Item{string} 16|23r20
+X 10 a-tiinio.ads
+43I9 Num 16|14r46
+45k21*Integer_IO 84e27 16|14r34
+65U14*Put 16|36s14[14] 38s14[14]
+66i7 Item{integer} 16|36r19[14] 38r19[14]
+67i7 Width{8|74I12} 16|36r33[14] 38r36[14]
+X 15 pantalla.ads
+11K9*Pantalla 39l5 39e13 16|12b14 132l5 132t13
+13I12*T_Fila{positive} 35r38 16|32r38
+14I12*T_Columna{positive} 35r56 16|32r56
+16E9*T_Color 17e57 27r50 16|60r35
+16n21*Verde{16E9} 16|67r15
+16n28*Rojo{16E9} 16|64r15
+16n34*Amarillo{16E9} 16|70r15
+16n44*Azul{16E9} 16|73r15
+16n50*Magenta{16E9} 16|76r15
+16n59*Azul_Claro{16E9} 16|79r15
+17n21*Blanco{16E9} 16|82r15
+17n29*Normal{16E9} 16|85r15
+17n37*Gris_Oscuro{16E9} 16|88r15
+17n50*Cierra{16E9} 16|91r15
+18E9*T_Color_Fondo 19e34 28r50 16|101r47
+18n27*Rojo{18E9} 16|105r15
+18n33*Verde{18E9} 16|108r15
+18n40*Azul{18E9} 16|114r15
+18n46*Naranja{18E9} 16|111r15
+18n55*Magenta{18E9} 16|117r15
+18n64*Azul_Claro{18E9} 16|120r15
+19n21*Gris{18E9} 16|123r15
+19n27*Normal{18E9} 16|126r15
+20E9*T_Atributo 20e50 26r50 16|46r41
+20n24*Normal{20E9} 16|24r23 50r15
+20n32*Inverso{20E9} 16|51r15
+20n41*Parpadeo{20E9} 16|52r15
+26U14*Poner_Atributo 26>33 16|24s7 46b14 54l8 54t22
+26e33 Atributo{20E9} 16|46b30 49r12
+27U14*Poner_Color 27>33 16|60b14 95l8 95t19
+27e33 Color{16E9} 16|60b27 63r12
+28U14*Poner_Color_Fondo 28>33 16|101b14 130l8 130t25
+28e33 Color_Fondo{18E9} 16|101b33 104r12
+34U14*Borrar 16|20b14 26l8 26t14
+35U14*Mover_Cursor 35>28 35>46 16|25s7 32b14 40l8 40t20
+35i28 Fila{13I12} 16|32b28 36r27
+35i46 Columna{14I12} 16|32b46 38r27
+37X4*Posicion_Incorrecta
+X 16 pantalla.adb
+14K12 Int_IO[10|45] 36r7 38r7
+61e7 Escape1{character} 65r26 68r26 71r26 74r26 77r26 80r26 83r26 86r26 89r26
+. 92r26
+102e7 Escape1{character} 106r26 109r26 112r26 115r26 118r26 121r26 124r26
+. 127r26
+X 34 text_io.ads
+24K9*Text_IO=24:29 16|11w6 14r26 22r7 23r7 34r7 35r7 37r7 39r7 48r7 50r27
+. 51r27 52r27 65r13 66r13 68r13 69r13 71r13 72r13 74r13 75r13 77r13 78r13
+. 80r13 81r13 83r13 84r13 86r13 87r13 89r13 90r13 92r13 93r13 106r13 107r13
+. 109r13 110r13 112r13 113r13 115r13 116r13 118r13 119r13 121r13 122r13 124r13
+. 125r13 127r13 128r13
+
